@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload and Position</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        #backgroundImage {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            border: 2px solid #ddd;
+            background-image: url('your-background-image.jpg'); /* Default image */
+            background-size: cover;
+            margin: 0 auto;
+        }
+
+        #uploadedImage {
+            position: absolute;
+            width: 100px; /* Default size */
+            height: 100px; /* Default size */
+            cursor: pointer;
+        }
+
+        #uploadButton {
+            margin-top: 20px;
+        }
+
+        #uploadInput {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Upload Image and Position It</h2>
+
+    <!-- Image container where the background image is shown -->
+    <div id="backgroundImage">
+        <img id="uploadedImage" src="" alt="Uploaded Image" style="display:none;">
+    </div>
+
+    <!-- Button to trigger file input -->
+    <button id="uploadButton">Upload Image</button>
+    <input type="file" id="uploadInput" accept="image/*">
+
+    <script>
+        // Get the elements
+        const uploadButton = document.getElementById('uploadButton');
+        const uploadInput = document.getElementById('uploadInput');
+        const uploadedImage = document.getElementById('uploadedImage');
+        const backgroundImage = document.getElementById('backgroundImage');
+
+        let isDragging = false;
+        let offsetX, offsetY;
+
+        // Open file input when the "Upload Image" button is clicked
+        uploadButton.addEventListener('click', function () {
+            uploadInput.click();
+        });
+
+        // Handle image upload
+        uploadInput.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    uploadedImage.src = event.target.result;
+                    uploadedImage.style.display = 'block';
+                    uploadedImage.style.left = '0px';  // Default starting position
+                    uploadedImage.style.top = '0px';   // Default starting position
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Enable dragging functionality
+        uploadedImage.addEventListener('mousedown', function (e) {
+            isDragging = true;
+            offsetX = e.clientX - uploadedImage.offsetLeft;
+            offsetY = e.clientY - uploadedImage.offsetTop;
+            document.addEventListener('mousemove', dragImage);
+            document.addEventListener('mouseup', stopDragging);
+        });
+
+        // Function to drag the image
+        function dragImage(e) {
+            if (isDragging) {
+                const x = e.clientX - offsetX;
+                const y = e.clientY - offsetY;
+                uploadedImage.style.left = `${x}px`;
+                uploadedImage.style.top = `${y}px`;
+            }
+        }
+
+        // Stop dragging the image
+        function stopDragging() {
+            isDragging = false;
+            document.removeEventListener('mousemove', dragImage);
+            document.removeEventListener('mouseup', stopDragging);
+        }
+    </script>
+
+</body>
+</html>

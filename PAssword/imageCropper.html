@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fabric.js Image Upload</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.6.0/fabric.min.js"></script>
+    <style>
+        #canvas {
+            border: 1px solid #ccc;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <input type="file" id="imageLoader" accept="image/*">
+    <button id="deleteBtn">Delete Selected</button>
+    <canvas id="canvas" width="800" height="600"></canvas>
+
+    <script>
+        // Initialize Fabric.js canvas
+        const canvas = new fabric.Canvas('canvas');
+
+        // Handle image upload
+        const imageLoader = document.getElementById('imageLoader');
+        imageLoader.addEventListener('change', handleImage, false);
+
+        function handleImage(e) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const imgObj = new Image();
+                imgObj.src = event.target.result;
+
+                imgObj.onload = function () {
+                    // Create a Fabric.js Image object
+                    const img = new fabric.Image(imgObj);
+                    img.set({
+                        left: 100,
+                        top: 100,
+                        angle: 0,
+                        padding: 10,
+                        cornersize: 10
+                    });
+                    // Add the image to the canvas and set it as the active object
+                    canvas.add(img).setActiveObject(img);
+                    canvas.renderAll(); // Render the canvas
+                };
+
+                imgObj.onerror = function () {
+                    console.error("Error loading image");
+                    alert("Error loading image. Please try a different file.");
+                };
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        }
+
+        // Handle delete action
+        const deleteButton = document.getElementById('deleteBtn');
+        deleteButton.addEventListener('click', function() {
+            const activeObject = canvas.getActiveObject();
+            if (activeObject) {
+                canvas.remove(activeObject);
+                canvas.renderAll();
+            } else {
+                alert("No image selected to delete.");
+            }
+        });
+
+        // Keyboard shortcut for delete
+        window.addEventListener('keydown', function (e) {
+            if (e.key === 'Delete') {
+                const activeObject = canvas.getActiveObject();
+                if (activeObject) {
+                    canvas.remove(activeObject);
+                    canvas.renderAll();
+                }
+            }
+        });
+    </script>
+</body>
+</html>s
